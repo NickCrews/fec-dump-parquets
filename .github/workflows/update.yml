@@ -21,7 +21,7 @@ jobs:
           path: ~/.cargo/bin/pg_dumpster
           key: ${{ runner.os }}-pg-dumpster-${{ hashFiles('init.sh') }}
 
-      - name: Install dependencies
+      - name: Install pg_dumpster
         if: steps.cache-pg-dumpster.outputs.cache-hit != 'true'
         run: ./init.sh
 
@@ -52,10 +52,12 @@ jobs:
           path: ~/.cargo/bin/pg_dumpster
           key: ${{ runner.os }}-pg-dumpster-${{ hashFiles('init.sh') }}
 
-      - name: Install dependencies
+      - name: Install pg_dumpster
         if: steps.cache-pg-dumpster.outputs.cache-hit != 'true'
         run: ./init.sh
 
+      - name: Install Hugging Face CLI
+        run: pip install huggingface_hub[cli]
       - name: Process Schedule A Table
         # We rely on bash to strip the literal quotes from the matrix table name string
         run: ./process-table.sh a ${{ matrix.table }}
@@ -79,10 +81,12 @@ jobs:
           path: ~/.cargo/bin/pg_dumpster
           key: ${{ runner.os }}-pg-dumpster-${{ hashFiles('init.sh') }}
 
-      - name: Install dependencies
+      - name: Install pg_dumpster
         if: steps.cache-pg-dumpster.outputs.cache-hit != 'true'
         run: ./init.sh
 
+      - name: Install Hugging Face CLI
+        run: pip install huggingface_hub[cli]
       - name: Process Schedule B Table
         # We rely on bash to strip the literal quotes from the matrix table name string
         run: ./process-table.sh b ${{ matrix.table }}
