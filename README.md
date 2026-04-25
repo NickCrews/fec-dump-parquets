@@ -1,7 +1,7 @@
-# fec-dump-parquets
+# fec-dumps
 
-Cron job that publishes .parquet files of the Schedule A and Schedule B
-tables of the FEC database.
+Cron job that publishes .parquet versions of the Schedule A and Schedule B
+tables from the weekly .dump backups from the Federal Election Commission's database.
 
 See https://github.com/fecgov/FEC/issues/13168 for motivation.
 
