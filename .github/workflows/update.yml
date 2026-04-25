@@ -1,0 +1,93 @@
+name: Update Parquets
+
+on:
+  schedule:
+    - cron: '0 0 * * 0' # Every week on Sunday at 00:00
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate-matrices:
+    runs-on: ubuntu-latest
+    outputs:
+      sched-a-matrix: ${{ steps.generate-a.outputs.matrix }}
+      sched-b-matrix: ${{ steps.generate-b.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache pg_dumpster
+        id: cache-pg-dumpster
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin/pg_dumpster
+          key: ${{ runner.os }}-pg-dumpster-${{ hashFiles('init.sh') }}
+
+      - name: Install dependencies
+        if: steps.cache-pg-dumpster.outputs.cache-hit != 'true'
+        run: ./init.sh
+
+      - id: generate-a
+        run: |
+          MATRIX=$(./ls-tables.sh a json)
+          echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
+
+      - id: generate-b
+        run: |
+          MATRIX=$(./ls-tables.sh b json)
+          echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
+
+  process-sched-a:
+    needs: generate-matrices
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        table: ${{ fromJson(needs.generate-matrices.outputs.sched-a-matrix) }}
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache pg_dumpster
+        id: cache-pg-dumpster
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin/pg_dumpster
+          key: ${{ runner.os }}-pg-dumpster-${{ hashFiles('init.sh') }}
+
+      - name: Install dependencies
+        if: steps.cache-pg-dumpster.outputs.cache-hit != 'true'
+        run: ./init.sh
+
+      - name: Process Schedule A Table
+        # We rely on bash to strip the literal quotes from the matrix table name string
+        run: ./process-table.sh a ${{ matrix.table }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  process-sched-b:
+    needs: generate-matrices
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        table: ${{ fromJson(needs.generate-matrices.outputs.sched-b-matrix) }}
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache pg_dumpster
+        id: cache-pg-dumpster
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin/pg_dumpster
+          key: ${{ runner.os }}-pg-dumpster-${{ hashFiles('init.sh') }}
+
+      - name: Install dependencies
+        if: steps.cache-pg-dumpster.outputs.cache-hit != 'true'
+        run: ./init.sh
+
+      - name: Process Schedule B Table
+        # We rely on bash to strip the literal quotes from the matrix table name string
+        run: ./process-table.sh b ${{ matrix.table }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
