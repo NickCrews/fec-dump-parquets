@@ -3,6 +3,11 @@
 Cron job that publishes .parquet files of the Schedule A and Schedule B
 tables of the FEC database.
 
+NOTE: turns out you can't publish files larger than 2GB to gitub releases on the free plan.
+I'm looking into workarounds now.
+
+---
+
 See https://github.com/fecgov/FEC/issues/13168 for motivation.
 
 All of the tables are published as parquet files to https://github.com/NickCrews/fec-dump-parquets/releases/tag/latest
