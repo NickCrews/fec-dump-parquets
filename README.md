@@ -15,6 +15,14 @@ over time, but the data will change every week.
 Note that columns in the parquets are all strings.
 I may change this later, so your using code should be defensive for future changes.
 
+## License
+
+I just repackaged the existing data FEC in an easier format,
+so the [normal regulations on FEC data](https://www.fec.gov/updates/sale-or-use-contributor-information/) still apply.
+
+All my code etc is MIT, you are free to modify and use as you wish,
+but with the data don't do something that the FEC doesn't like.
+
 ## Methodology
 
 This uses the https://github.com/NickCrews/pg_dumpster cli tool to
